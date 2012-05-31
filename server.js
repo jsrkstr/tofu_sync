@@ -6,7 +6,7 @@ console.log("dbhost is");
 console.log(process.env["DBHOST"]);
 
 if(process.env["DBHOST"]){
-	var connection = new(cradle.Connection)(host, 5884, {
+	var connection = new(cradle.Connection)(host, 5984, {
 	// secure: true,
 	auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});

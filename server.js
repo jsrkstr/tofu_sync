@@ -4,7 +4,18 @@ var cradle = require('cradle');
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
 console.log("dbhost is");
 console.log(process.env["DBHOST"]);
-var db = new(cradle.Connection)(host).database('tofuapp');
+
+if(process.env["DBHOST"]){
+	var connection = new(cradle.Connection)(host, 5884, {
+	// secure: true,
+	auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
+	});
+	var db = connection.database("tofuapp");
+	console.log("connection 1");
+} else {
+	var db = new(cradle.Connection)(host).database('tofuapp');
+	console.log("connection 2");
+}
 
 db.get('123', function (err, doc) {
 	if(err)

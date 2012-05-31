@@ -6,21 +6,24 @@ console.log("dbhost is");
 console.log(process.env["DBHOST"]);
 var db = new(cradle.Connection)(host).database('tofuapp');
 
-// db.get('123', function (err, doc) {
-//   console.log(doc.title); // 'Darth Vader'
-//   // assert.equal(doc.force, 'dark');
-// });
-
-db.save('skywalker', {
-  force: 'light',
-  name: 'Luke Skywalker'
-}, function (err, res) {
-  if (err) {
-      console.log("error aaya");// Handle error
-  } else {
-      console.log("success hua!!")// Handle success
-  }
+db.get('123', function (err, doc) {
+	if(err)
+		console.log("error ayayaa");
+	else
+	  console.log(doc.title); // 'Darth Vader'
+  // assert.equal(doc.force, 'dark');
 });
+
+// db.save('skywalker', {
+//   force: 'light',
+//   name: 'Luke Skywalker'
+// }, function (err, res) {
+//   if (err) {
+//       console.log("error aaya");// Handle error
+//   } else {
+//       console.log("success hua!!")// Handle success
+//   }
+// });
 
 
 

@@ -2,6 +2,8 @@ var http = require('http');
 var cradle = require('cradle');
 
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
+console.log("dbhost is");
+console.log(process.env["DBHOST"]);
 var db = new(cradle.Connection)(host).database('tofuapp');
 
 // db.get('123', function (err, doc) {

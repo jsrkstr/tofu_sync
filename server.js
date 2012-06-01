@@ -2,14 +2,31 @@ var app_server = require('http').createServer(handler)
   , io = require('socket.io').listen(app_server)
   , cradle = require("cradle");
 
-app_server.listen(8954);
+
+var port = process.env["app_port"] || 3000;
+app_server.listen(port);
+
+console.log("environment is", process.env["NODE_ENV"], process.env["ENV"]);
 
 
-var handler = function (req, res) {
+function handler(req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   res.end('Hello World\nApp (tofuapp) is running..');
 };
 
+
+
+io.enable('browser client minification');  // send minified client
+io.enable('browser client etag');          // apply etag caching logic based on version number
+io.enable('browser client gzip');          // gzip the file
+io.set('log level', 1);                    // reduce logging
+io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+    'websocket'
+  , 'flashsocket'
+  , 'htmlfile'
+  , 'xhr-polling'
+  , 'jsonp-polling'
+]);
 
 
 
@@ -29,8 +46,7 @@ var App = {
 }
 
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
-console.log("dbhost is");
-console.log(process.env["DBHOST"]);
+console.log("dbhost is", process.env["DBHOST"]);
 
 
 if(process.env["DBHOST"]){
@@ -39,10 +55,10 @@ if(process.env["DBHOST"]){
 		auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});
 	App.db = connection.database("tofuapp");
-	console.log("connection 1");
+	console.log("cloud db connected");
 } else {
 	App.db = new(cradle.Connection)(host).database('tofuapp');
-	console.log("connection 2");
+	console.log("local db connected");
 }
 
 

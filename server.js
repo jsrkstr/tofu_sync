@@ -6,7 +6,7 @@ var app_server = require('http').createServer(handler)
 var port = process.env["app_port"] || 3000;
 app_server.listen(port);
 
-console.log("environment is", process.env["NODE_ENV"], process.env["ENV"]);
+console.log("environment is", process.env["NODE_ENV"]);
 
 
 function handler(req, res) {
@@ -16,17 +16,25 @@ function handler(req, res) {
 
 
 
-io.enable('browser client minification');  // send minified client
-io.enable('browser client etag');          // apply etag caching logic based on version number
-io.enable('browser client gzip');          // gzip the file
-io.set('log level', 1);                    // reduce logging
-io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-    'websocket'
-  , 'flashsocket'
-  , 'htmlfile'
-  , 'xhr-polling'
-  , 'jsonp-polling'
-]);
+io.configure('production', function(){
+	io.enable('browser client minification');  // send minified client
+	io.enable('browser client etag');          // apply etag caching logic based on version number
+	io.enable('browser client gzip');          // gzip the file
+	io.set('log level', 1);                    // reduce logging
+	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
+	    'websocket'
+	  , 'flashsocket'
+	  , 'htmlfile'
+	  , 'xhr-polling'
+	  , 'jsonp-polling'
+	]);
+});
+
+io.configure('development', function(){
+	io.set('log level', 1);                    // reduce logging
+});
+
+
 
 
 

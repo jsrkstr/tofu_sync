@@ -113,7 +113,7 @@ if(process.env["DBHOST"]){
 
 
 
-App.publish = function(socket, data){
+App.publish = function(socket, data, fn){
 
 	// console.log("publisher", socket.id, data)
 
@@ -132,9 +132,9 @@ App.publish = function(socket, data){
 
 		App.db.save(data, function (err, res) {
 		  if (err) {
-		    // Handle error
+		    fn({ error : true}); // Handle error
 		  } else {
-		    // Handle success
+		    fn(res); // Handle success
 		  }
 		});
 
@@ -143,19 +143,21 @@ App.publish = function(socket, data){
 
 
 
-App.history = function(socket, limit, fn){
+// resource is type of doc, comments, or other things
+App.history = function(socket, resource, fn){
 
 	socket.get("user_id", function(err, user_id){
 
-		App.db.view('tofuapp/comments', { key: user_id }, function (err, data) {
+		App.db.view('tofuapp/' + resource, { key: user_id }, function (err, data) {
 			var  docs = [];
 			for(var item in data){
 				docs.push(data[item].value);
 			}
 
-			// fire response to author
-			if(fn)
-				fn(docs);
+			if(err)
+				fn({error : true});
+			else
+				fn(docs)
 		});
 
 	});
@@ -172,12 +174,7 @@ io.sockets.on("connection", function(socket){
 
 		// validate
 		if(data)
-			App.publish(socket, data)
-
-		// fire response to author
-		if(fn)
-			fn({ok : true});
-		
+			App.publish(socket, data, fn);
 	});
 
 
@@ -197,8 +194,9 @@ io.sockets.on("connection", function(socket){
 
 
 
-    socket.on('history', function(limit, fn){
-    	App.history(socket, limit, fn);
+    socket.on('history', function(backend, fn){
+    	if(fn)
+    		App.history(socket, backend, fn);
     });
 
 

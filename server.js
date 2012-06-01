@@ -109,7 +109,10 @@ App.history = function(socket, limit, fn){
 			for(var item in data){
 				docs.push(data[item].value);
 			}
-			fn(docs);
+
+			// fire response to author
+			if(fn)
+				fn(docs);
 		});
 
 	});
@@ -135,13 +138,17 @@ io.sockets.on("connection", function(socket){
 	});
 
 
-	socket.on('register', function(user_id) {
+	socket.on('register', function(user_id, fn) {
 		
 		// set user_id into socket and socketid in allUsers 
 		socket.set('user_id', user_id, function () {
       		App.users[user_id] = socket.id;
       		console.log("registered", user_id);
     	});
+
+    	// fire response to author
+		if(fn)
+			fn({ok : true});
 		
     });
 

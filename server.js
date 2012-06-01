@@ -1,27 +1,43 @@
-var app_server = require('http').createServer(handler)
-  , io = require('socket.io').listen(app_server)
-  , cradle = require("cradle")
-  , fs = require('fs');
+var express = require('express')
+  , app = express.createServer()
+  , io = require('socket.io').listen(app)
+  , cradle = require("cradle");
 
 
-var port = process.env["app_port"] || 3000;
-app_server.listen(port);
+
+var port = process.env["app_port"] || 3001;
+app.listen(port);
 
 console.log("environment is", process.env["NODE_ENV"]);
 
 
-function handler (req, res) {
-  fs.readFile(__dirname + '/index.html',
-  function (err, data) {
-    if (err) {
-      res.writeHead(500);
-      return res.end('Error loading index.html');
-    }
+app.configure(function(){
+    // app.use(express.methodOverride());
+    app.use(express.bodyParser());
+    // app.use(app.router);
+});
 
-    res.writeHead(200);
-    res.end(data);
-  });
-}
+app.get('/', function (req, res) {
+  res.sendfile(__dirname + '/index.html');
+});
+
+
+
+app.post('/publish', function(req, res){
+  	console.log("POST /publish to users ", req.body.data);
+
+  	var data = JSON.parse(req.body.data);
+  	var recipient_ids = data.all_recipient_ids;
+  	console.log("ids", recipient_ids[0]);
+  	if(recipient_ids){
+		for (var i = recipient_ids.length - 1; i >= 0; i--) {
+			var recipient_id = recipient_ids[i];
+			App.emit_to_user(recipient_id, data);
+		}
+	}
+
+	res.send({ok : true});
+});
 
 
 
@@ -59,9 +75,11 @@ var App = {
 	users : {},
 
 	emit_to_user : function(user_id, message){
+		console.log("emmiting to user")
 		var user_socket_id = App.users[user_id];
 
 		if (user_socket_id) {
+			console.log("found socket");
 			var socket = io.sockets.sockets[user_socket_id];
 			socket.emit("message", message);
 			console.log('emit to user ', user_id);

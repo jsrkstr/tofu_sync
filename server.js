@@ -12,25 +12,27 @@ console.log("environment is", process.env["NODE_ENV"]);
 
 
 app.configure(function(){
-    // app.use(express.methodOverride());
+	app.use(express.static(__dirname + '/public'));
     app.use(express.bodyParser());
-    // app.use(app.router);
 });
 
 app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
+	res.sendfile(__dirname + '/index.html');
 });
 
 
-
+// Realtime publish via post
 app.post('/publish', function(req, res){
-  	console.log("POST /publish to users ", req.body.data);
+  	console.log("POST /publish");
 
   	var data = JSON.parse(req.body.data);
-  	var recipient_ids = data.all_recipient_ids;
-  	console.log("ids", recipient_ids[0]);
+
+  	var recipient_ids = data.recipient_ids;
+
   	if(recipient_ids){
+
 		for (var i = recipient_ids.length - 1; i >= 0; i--) {
+
 			var recipient_id = recipient_ids[i];
 			App.emit_to_user(recipient_id, data);
 		}
@@ -75,17 +77,21 @@ var App = {
 	users : {},
 
 	emit_to_user : function(user_id, message){
-		console.log("emmiting to user")
+
 		var user_socket_id = App.users[user_id];
 
 		if (user_socket_id) {
-			console.log("found socket");
+
 			var socket = io.sockets.sockets[user_socket_id];
 			socket.emit("message", message);
-			console.log('emit to user ', user_id);
 		}
 	}
 }
+
+
+
+
+
 
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
 console.log("dbhost is", process.env["DBHOST"]);
@@ -104,9 +110,12 @@ if(process.env["DBHOST"]){
 }
 
 
+
+
+
 App.publish = function(socket, data){
 
-	console.log("publisher", socket.id, data)
+	// console.log("publisher", socket.id, data)
 
 	// send realtime for all and save to db for all
 	if(data.recipient_ids){
@@ -123,9 +132,9 @@ App.publish = function(socket, data){
 
 		App.db.save(data, function (err, res) {
 		  if (err) {
-		      console.log("error aaya", err);// Handle error
+		    // Handle error
 		  } else {
-		      console.log("saved doc")// Handle success
+		    // Handle success
 		  }
 		});
 

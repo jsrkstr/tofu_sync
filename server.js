@@ -49,10 +49,10 @@ io.configure('production', function(){
 	io.enable('browser client gzip');          // gzip the file
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  // 'websocket',
-	  // 'flashsocket',
-	  // 'htmlfile',
-	  // 'xhr-polling',
+	  'websocket',
+	  'flashsocket',
+	  'htmlfile',
+	  'xhr-polling',
 	  'jsonp-polling'
 	]);
 });
@@ -60,10 +60,10 @@ io.configure('production', function(){
 io.configure('development', function(){
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  // 'websocket',
-	  // 'flashsocket',
-	  // 'htmlfile',
-	  // 'xhr-polling',
+	  'websocket',
+	  'flashsocket',
+	  'htmlfile',
+	  'xhr-polling',
 	  'jsonp-polling'
 	]);
 });
@@ -96,16 +96,17 @@ var App = {
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
 console.log("dbhost is", process.env["DBHOST"]);
 
-
-if(process.env["DBHOST"]){
+if(process.env["DBHOST"]){ // cloudnode
 	var connection = new(cradle.Connection)(host, 5984, {
 		// secure: true,
 		auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});
 	App.db = connection.database("tofuapp");
 	console.log("cloud db connected");
-} else {
-	App.db = new(cradle.Connection)(host).database('tofuapp');
+} else if(process.env["app_port"] == 18301 || process.env["app_port"] == "18301"){ // nodester
+
+} else { // local
+	App.db = new(cradle.Connection)(host).database('tofuapp'); 
 	console.log("local db connected");
 }
 

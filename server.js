@@ -102,9 +102,17 @@ if(process.env["DBHOST"]){ // cloudnode
 		auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});
 	App.db = connection.database("tofuapp");
-	console.log("cloud db connected");
+	console.log("cloudnode db connected");
+
 } else if(process.env["app_port"] == 18301 || process.env["app_port"] == "18301"){ // nodester
 
+	host = "http://rollingbuddy.iriscouch.com";
+	var connection = new(cradle.Connection)(host, 80, {
+		// secure: true,
+		auth: { username: "sachin", password: "tooocuuul" }
+	});
+	App.db = connection.database("tofuapp");
+	console.log("iriscouch db connected");
 } else { // local
 	App.db = new(cradle.Connection)(host).database('tofuapp'); 
 	console.log("local db connected");

@@ -96,6 +96,9 @@ var App = {
 var host = process.env["DBHOST"] ? process.env["DBHOST"] : "127.0.0.1";
 console.log("dbhost is", process.env["DBHOST"]);
 
+console.log("HOST is", process.env["HOST"]);
+console.log("app_host is", process.env["app_host"]);
+
 if(process.env["DBHOST"]){ // cloudnode
 	var connection = new(cradle.Connection)(host, 5984, {
 		// secure: true,
@@ -104,7 +107,7 @@ if(process.env["DBHOST"]){ // cloudnode
 	App.db = connection.database("tofuapp");
 	console.log("cloudnode db connected");
 
-} else if(process.env["app_port"] == 18301 || process.env["app_port"] == "18301"){ // nodester
+} else if(process.env["app_port"] == 18310 || process.env["app_port"] == "18310"){ // nodester
 
 	host = "http://rollingbuddy.iriscouch.com";
 	var connection = new(cradle.Connection)(host, 80, {

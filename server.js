@@ -27,14 +27,25 @@ app.post('/publish', function(req, res){
 
   	var data = JSON.parse(req.body.data);
 
-  	var recipient_ids = data.recipient_ids;
+  	if(data.recipient_ids){
+  		var recipients = data.recipient_ids.split(",");
 
-  	if(recipient_ids){
+  		// send to each recipient
+		for (var i = recipients.length - 1; i >= 0; i--) {
 
-		for (var i = recipient_ids.length - 1; i >= 0; i--) {
+			var id = recipients[i];
+			App.emit_to_user(id, data);
+		}
 
-			var recipient_id = recipient_ids[i];
-			App.emit_to_user(recipient_id, data);
+		// save to db
+		if(data.group == "comment"){
+			App.db.save(data, function (err, res) {
+			  if (err) {
+			  	console.log("error saving comment");
+			  } else {
+			    // console.log("saved comment");
+			  }
+			});
 		}
 	}
 
@@ -60,7 +71,7 @@ io.configure('production', function(){
 io.configure('development', function(){
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  // 'websocket',
+	  'websocket',
 	  'flashsocket',
 	  'htmlfile',
 	  'xhr-polling',
@@ -160,7 +171,8 @@ App.history = function(socket, resource, fn){
 
 	socket.get("user_id", function(err, user_id){
 
-		App.db.view('tofuapp/' + resource, { key: user_id }, function (err, data) {
+		App.db.view('tofuapp/' + resource, { key: parseInt(user_id) }, function (err, data) {
+
 			var  docs = [];
 			for(var item in data){
 				docs.push(data[item].value);
@@ -235,4 +247,4 @@ io.sockets.on("connection", function(socket){
 //   });
 
 // socket.emit("publish", "comment", {recipient_ids : [222], greeting : "Hey lolay!", author_id : 111}, function(reply){console.log(reply)})
-//socket.emit("history", 100, function(d){console.log(d)})
+//socket.emit("history", "comments", function(d){console.log(d)})

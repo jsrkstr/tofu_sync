@@ -49,7 +49,7 @@ io.configure('production', function(){
 	io.enable('browser client gzip');          // gzip the file
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  //'websocket',
+	  'websocket',
 	  'flashsocket',
 	  'htmlfile',
 	  'xhr-polling',
@@ -60,7 +60,7 @@ io.configure('production', function(){
 io.configure('development', function(){
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  //'websocket',
+	  'websocket',
 	  'flashsocket',
 	  'htmlfile',
 	  'xhr-polling',

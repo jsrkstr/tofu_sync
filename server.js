@@ -22,24 +22,27 @@ app.get('/', function (req, res) {
 
 
 // Realtime publish via post
+// accepts { recipient_ids : array, message : json}
 app.post('/publish', function(req, res){
   	console.log("POST /publish");
 
-  	var data = JSON.parse(req.body.data);
+  	var data = {};
+  	data.recipient_ids = req.body.recipient_ids;
+  	data.message = JSON.parse(req.body.message);
 
   	if(data.recipient_ids){
-  		var recipients = data.recipient_ids.split(",");
+  		var recipients = data.recipient_ids;
 
   		// send to each recipient
 		for (var i = recipients.length - 1; i >= 0; i--) {
 
 			var id = recipients[i];
-			App.emit_to_user(id, data);
+			App.emit_to_user(id, data.message);
 		}
 
 		// save to db
-		if(data.group == "comment"){
-			App.db.save(data, function (err, res) {
+		if(data.message.group == "comment"){
+			App.db.save(data.message, function (err, res) {
 			  if (err) {
 			  	console.log("error saving comment");
 			  } else {

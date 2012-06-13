@@ -174,7 +174,7 @@ App.history = function(socket, resource, fn){
 
 	socket.get("user_id", function(err, user_id){
 
-		App.db.view('tofuapp/' + resource, { key: parseInt(user_id) }, function (err, data) {
+		App.db.view('tofuapp/' + resource, { key: parseInt(user_id), limit : 100 }, function (err, data) {
 
 			var  docs = [];
 			for(var item in data){

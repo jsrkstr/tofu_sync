@@ -63,7 +63,7 @@ io.configure('production', function(){
 	io.enable('browser client gzip');          // gzip the file
 	io.set('log level', 1);                    // reduce logging
 	io.set('transports', [                     // enable all transports (optional if you want flashsocket)
-	  // 'websocket',
+	  'websocket',
 	  'flashsocket',
 	  'htmlfile',
 	  'xhr-polling',
@@ -118,7 +118,7 @@ if(process.env["DBHOST"]){ // cloudnode
 		// secure: true,
 		auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});
-	App.db = connection.database("tofooapp");
+	App.db = connection.database("tofapp");
 	console.log("cloudnode db connected");
 
 } else if(process.env["app_port"] == 18310 || process.env["app_port"] == "18310"){ // nodester

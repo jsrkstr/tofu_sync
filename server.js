@@ -118,7 +118,7 @@ if(process.env["DBHOST"]){ // cloudnode
 		// secure: true,
 		auth: { username: process.env["DBUSER"], password: process.env["DBPWD"] }
 	});
-	App.db = connection.database("tofuapp");
+	App.db = connection.database("tofooapp");
 	console.log("cloudnode db connected");
 
 } else if(process.env["app_port"] == 18310 || process.env["app_port"] == "18310"){ // nodester

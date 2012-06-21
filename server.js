@@ -90,12 +90,14 @@ var App = {
 
 	users : {},
 
+	friendLists : {},
+
 	emit_to_user : function(user_id, message){
 
 		var user_socket_id = App.users[user_id];
 
 		if (user_socket_id) {
-
+			console.log("presence emitted ");
 			var socket = io.sockets.sockets[user_socket_id];
 			socket.emit("message", message);
 		}
@@ -192,6 +194,37 @@ App.history = function(socket, resource, fn){
 
 
 
+// Presence test for user friends
+// also here the user registers for presence updates
+App.presence = function(socket, friendList, fn){
+
+	socket.get("user_id", function(err, user_id){
+
+		App.friendLists[user_id] = friendList;
+
+		//send presence to all online friends
+		for (var i = friendList.length - 1; i >= 0; i--) {	
+			console.log("emitting presence");
+			App.emit_to_user(friendList[i], { group : "presence", action : "online", ids : [user_id] });
+		};
+
+		// send online friends to this user
+		var onlineFriends = [];
+
+		for(userId in App.users){
+			var uid = parseInt(userId);
+			if(friendList.indexOf(uid) != -1){
+				onlineFriends.push(uid);
+			}
+		}
+
+		fn(onlineFriends);
+
+	});
+};
+
+
+
 
 
 io.sockets.on("connection", function(socket){
@@ -228,9 +261,25 @@ io.sockets.on("connection", function(socket){
 
 
 
+	socket.on("presence", function(friendList, fn){
+		if(fn)
+			App.presence(socket, friendList, fn);
+	});
+
+
+
     socket.on('disconnect', function() {
 
     	socket.get("user_id", function(err, user_id){
+
+    		var friendList = App.friendLists[user_id];
+
+			//send non-presence
+			for (var i = friendList.length - 1; i >= 0; i--) {	
+				App.emit_to_user(friendList[i], { group : "presence", action : "offline", ids : [user_id] });
+			};
+
+			delete App.friendLists[user_id];
     		delete App.users[user_id];
     		console.log("disconnected", user_id);
     	});

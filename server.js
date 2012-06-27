@@ -97,7 +97,6 @@ var App = {
 		var user_socket_id = App.users[user_id];
 
 		if (user_socket_id) {
-			console.log("presence emitted ");
 			var socket = io.sockets.sockets[user_socket_id];
 			socket.emit("message", message);
 		}
@@ -176,7 +175,7 @@ App.history = function(socket, resource, fn){
 
 	socket.get("user_id", function(err, user_id){
 
-		App.db.view('tofuapp/' + resource, { key: parseInt(user_id), limit : 200, descending: "true"  }, function (err, data) {
+		App.db.view('tofuapp/' + resource, { key: parseInt(user_id), limit : 200, ascending: "true"  }, function (err, data) {
 
 			var  docs = [];
 			for(var item in data){
@@ -204,7 +203,6 @@ App.presence = function(socket, friendList, fn){
 
 		//send presence to all online friends
 		for (var i = friendList.length - 1; i >= 0; i--) {	
-			console.log("emitting presence");
 			App.emit_to_user(friendList[i], { group : "presence", action : "online", ids : [user_id] });
 		};
 
